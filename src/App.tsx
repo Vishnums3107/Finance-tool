@@ -1,14 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DashboardOverview } from './components/DashboardOverview'
 import { DateRangeSelectorMock } from './components/DateRangeSelectorMock'
 import { InsightsSection } from './components/InsightsSection'
+import { NoDataBanner } from './components/NoDataBanner'
 import { RoleBasedAccessSection } from './components/RoleBasedAccessSection'
 import { StateManagementSection } from './components/StateManagementSection'
+import { ThemeToggle } from './components/ThemeToggle'
 import { TransactionsSection } from './components/TransactionsSection'
 import { dateRangePresetLabels, type DateRangePreset } from './lib/dateRange'
 import { exportTransactionsCsv } from './lib/export'
 import { formatCount } from './lib/format'
 import { useFinanceDashboardState } from './store/useFinanceDashboardState'
+import { useUiPreferencesStore } from './store/useUiPreferencesStore'
 
 function App() {
   const [reportingRange, setReportingRange] = useState<DateRangePreset>('qtd')
@@ -17,6 +20,7 @@ function App() {
     role,
     filters,
     editingTransaction,
+    transactionCount,
     filteredTransactions,
     summary,
     monthlyTrend,
@@ -33,9 +37,18 @@ function App() {
     clearEditingTransaction,
     addTransaction,
     updateTransaction,
+    restoreDemoData,
   } = useFinanceDashboardState()
 
+  const themeMode = useUiPreferencesStore((state) => state.themeMode)
+  const toggleThemeMode = useUiPreferencesStore((state) => state.toggleThemeMode)
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', themeMode)
+  }, [themeMode])
+
   const latestMonth = monthlyTrend[monthlyTrend.length - 1]?.monthLabel ?? 'N/A'
+  const hasNoTransactions = transactionCount === 0
 
   return (
     <div className="app-shell">
@@ -48,7 +61,7 @@ function App() {
           </p>
           <div className="topbar-meta">
             <span className="meta-chip">Reporting Month: {latestMonth}</span>
-            <span className="meta-chip">Transactions: {formatCount(summary.transactionCount)}</span>
+            <span className="meta-chip">Transactions: {formatCount(transactionCount)}</span>
             <span className="meta-chip">Active Filters: {activeFilterCount}</span>
           </div>
           <p className="print-only print-context">
@@ -57,6 +70,7 @@ function App() {
         </div>
 
         <div className="topbar-actions screen-only">
+          <ThemeToggle themeMode={themeMode} onToggle={toggleThemeMode} />
           <DateRangeSelectorMock
             value={reportingRange}
             onChange={setReportingRange}
@@ -78,6 +92,10 @@ function App() {
       </header>
 
       <main className="layout-grid">
+        {hasNoTransactions && (
+          <NoDataBanner role={role} onRestoreDemoData={restoreDemoData} />
+        )}
+
         <DashboardOverview
           summary={summary}
           monthlyTrend={monthlyTrend}
@@ -127,7 +145,7 @@ function App() {
 
           <StateManagementSection
             role={role}
-            transactionCount={summary.transactionCount}
+            transactionCount={transactionCount}
             activeFilterCount={activeFilterCount}
             filters={filters}
           />

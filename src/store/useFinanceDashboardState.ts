@@ -29,6 +29,7 @@ export const useFinanceDashboardState = () => {
   )
   const addTransaction = useFinanceStore((state) => state.addTransaction)
   const updateTransaction = useFinanceStore((state) => state.updateTransaction)
+  const restoreDemoData = useFinanceStore((state) => state.restoreDemoData)
 
   const filteredTransactions = useMemo(
     () => filterAndSortTransactions(transactions, filters),
@@ -80,6 +81,7 @@ export const useFinanceDashboardState = () => {
   return {
     role,
     transactions,
+    transactionCount: transactions.length,
     filters,
     editingTransaction,
     filteredTransactions,
@@ -98,5 +100,6 @@ export const useFinanceDashboardState = () => {
     clearEditingTransaction,
     addTransaction,
     updateTransaction,
+    restoreDemoData,
   }
 }

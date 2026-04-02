@@ -47,9 +47,11 @@ Frontend finance dashboard built for internship assessment evaluation.
 
 ### Optional Enhancements Included
 
-1. Local storage persistence.
-2. CSV export for filtered transactions.
-3. Motion and staged reveal animations.
+1. Dark mode toggle with persisted preference.
+2. Local storage persistence.
+3. CSV export for filtered transactions.
+4. Motion and staged reveal animations.
+5. No-data recovery banner with demo restore action.
 
 ## Project Structure
 
@@ -107,6 +109,7 @@ Full requirement and evaluation mapping documents:
 3. [docs/06-evaluation-mapping.md](docs/06-evaluation-mapping.md)
 4. [docs/07-git-progress-tracking.md](docs/07-git-progress-tracking.md)
 5. [docs/08-state-management-implementation.md](docs/08-state-management-implementation.md)
+6. [docs/09-ui-ux-implementation.md](docs/09-ui-ux-implementation.md)
 
 ## Notes
 

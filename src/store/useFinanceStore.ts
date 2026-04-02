@@ -39,6 +39,7 @@ interface FinanceStore {
   clearEditingTransaction: () => void
   addTransaction: (draft: TransactionDraft) => void
   updateTransaction: (id: string, draft: TransactionDraft) => void
+  restoreDemoData: () => void
 }
 
 export const useFinanceStore = create<FinanceStore>()(
@@ -114,6 +115,13 @@ export const useFinanceStore = create<FinanceStore>()(
             }),
           }
         })
+      },
+      restoreDemoData: () => {
+        set(() => ({
+          transactions: seedTransactions,
+          filters: createDefaultFilters(),
+          editingTransactionId: null,
+        }))
       },
     }),
     {

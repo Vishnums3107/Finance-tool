@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { Transaction, TransactionDraft, UserRole } from '../types/finance'
 
 interface TransactionFormProps {
@@ -44,9 +44,22 @@ export const TransactionForm = ({
   onSubmit,
   onCancelEdit,
 }: TransactionFormProps) => {
+  const categoryOptions = useMemo(
+    () => Array.from(new Set(categories)).sort((a, b) => a.localeCompare(b)),
+    [categories],
+  )
+
   const [draft, setDraft] = useState<TransactionDraft>(() =>
     getInitialDraft(editingTransaction, categories),
   )
+
+  const [customCategoryEnabled, setCustomCategoryEnabled] = useState(() => {
+    if (!editingTransaction) {
+      return categoryOptions.length === 0
+    }
+
+    return !categoryOptions.includes(editingTransaction.category)
+  })
 
   const mode = editingTransaction ? 'edit' : 'create'
 
@@ -132,24 +145,59 @@ export const TransactionForm = ({
 
       <label>
         <span className="control-label">Category</span>
-        <input
-          type="text"
-          value={draft.category}
-          list="category-options"
-          placeholder="Example: Food"
-          onChange={(event) =>
+        <select
+          value={customCategoryEnabled ? '__custom__' : draft.category}
+          onChange={(event) => {
+            const selectedValue = event.target.value
+
+            if (selectedValue === '__custom__') {
+              setCustomCategoryEnabled(true)
+
+              if (categoryOptions.includes(draft.category)) {
+                setDraft((current) => ({
+                  ...current,
+                  category: '',
+                }))
+              }
+
+              return
+            }
+
+            setCustomCategoryEnabled(false)
             setDraft((current) => ({
               ...current,
-              category: event.target.value,
+              category: selectedValue,
             }))
-          }
+          }}
           required
-        />
-        <datalist id="category-options">
-          {categories.map((category) => (
-            <option key={category} value={category} />
+        >
+          {categoryOptions.length === 0 && (
+            <option value="" disabled>
+              No categories available yet
+            </option>
+          )}
+          {categoryOptions.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
           ))}
-        </datalist>
+          <option value="__custom__">Custom category...</option>
+        </select>
+
+        {customCategoryEnabled && (
+          <input
+            type="text"
+            value={draft.category}
+            placeholder="Enter custom category"
+            onChange={(event) =>
+              setDraft((current) => ({
+                ...current,
+                category: event.target.value,
+              }))
+            }
+            required
+          />
+        )}
       </label>
 
       <label>

@@ -2,6 +2,7 @@ import { formatMonthLabel } from '../lib/format'
 import type {
   SortDirection,
   SortField,
+  TransactionGroupBy,
   TransactionFilters as TransactionFiltersState,
 } from '../types/finance'
 
@@ -25,6 +26,29 @@ const directionLabels: Array<{ value: SortDirection; label: string }> = [
   { value: 'desc', label: 'Descending' },
   { value: 'asc', label: 'Ascending' },
 ]
+
+const groupingLabels: Array<{ value: TransactionGroupBy; label: string }> = [
+  { value: 'none', label: 'No Grouping' },
+  { value: 'category', label: 'Group by Category' },
+  { value: 'month', label: 'Group by Month' },
+  { value: 'type', label: 'Group by Type' },
+]
+
+const parseOptionalNumber = (value: string) => {
+  const trimmed = value.trim()
+
+  if (trimmed.length === 0) {
+    return null
+  }
+
+  const numeric = Number(trimmed)
+
+  if (Number.isNaN(numeric)) {
+    return null
+  }
+
+  return numeric
+}
 
 export const TransactionFiltersBar = ({
   filters,
@@ -130,6 +154,56 @@ export const TransactionFiltersBar = ({
           {directionLabels.map((direction) => (
             <option key={direction.value} value={direction.value}>
               {direction.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label>
+        <span className="control-label">Min Amount</span>
+        <input
+          type="number"
+          min={0}
+          step={1}
+          value={filters.minAmount ?? ''}
+          placeholder="No min"
+          onChange={(event) =>
+            onUpdateFilters({
+              minAmount: parseOptionalNumber(event.target.value),
+            })
+          }
+        />
+      </label>
+
+      <label>
+        <span className="control-label">Max Amount</span>
+        <input
+          type="number"
+          min={0}
+          step={1}
+          value={filters.maxAmount ?? ''}
+          placeholder="No max"
+          onChange={(event) =>
+            onUpdateFilters({
+              maxAmount: parseOptionalNumber(event.target.value),
+            })
+          }
+        />
+      </label>
+
+      <label>
+        <span className="control-label">Grouping</span>
+        <select
+          value={filters.groupBy}
+          onChange={(event) =>
+            onUpdateFilters({
+              groupBy: event.target.value as TransactionGroupBy,
+            })
+          }
+        >
+          {groupingLabels.map((groupingLabel) => (
+            <option key={groupingLabel.value} value={groupingLabel.value}>
+              {groupingLabel.label}
             </option>
           ))}
         </select>

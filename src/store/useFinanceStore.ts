@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { seedTransactions } from '../data/seedTransactions'
+import { fetchMockTransactions } from '../api/mockFinanceApi'
 import type {
   Transaction,
   TransactionDraft,
@@ -21,6 +22,9 @@ const createDefaultFilters = (): TransactionFilters => ({
   type: 'all',
   category: 'all',
   month: 'all',
+  minAmount: null,
+  maxAmount: null,
+  groupBy: 'none',
   sortBy: 'date',
   sortDir: 'desc',
 })
@@ -32,6 +36,8 @@ interface FinanceStore {
   transactions: Transaction[]
   filters: TransactionFilters
   editingTransactionId: string | null
+  isMockApiLoading: boolean
+  mockApiError: string | null
   setRole: (role: UserRole) => void
   setFilters: (partialFilters: Partial<TransactionFilters>) => void
   resetFilters: () => void
@@ -40,15 +46,18 @@ interface FinanceStore {
   addTransaction: (draft: TransactionDraft) => void
   updateTransaction: (id: string, draft: TransactionDraft) => void
   restoreDemoData: () => void
+  loadTransactionsFromMockApi: () => Promise<void>
 }
 
 export const useFinanceStore = create<FinanceStore>()(
   persist(
     (set) => ({
       role: 'viewer',
-      transactions: seedTransactions,
+      transactions: [],
       filters: createDefaultFilters(),
       editingTransactionId: null,
+      isMockApiLoading: false,
+      mockApiError: null,
       setRole: (role) => {
         set(() => ({ role, editingTransactionId: null }))
       },
@@ -118,10 +127,37 @@ export const useFinanceStore = create<FinanceStore>()(
       },
       restoreDemoData: () => {
         set(() => ({
-          transactions: seedTransactions,
+          transactions: seedTransactions.map((transaction) => ({ ...transaction })),
           filters: createDefaultFilters(),
           editingTransactionId: null,
+          isMockApiLoading: false,
+          mockApiError: null,
         }))
+      },
+      loadTransactionsFromMockApi: async () => {
+        set(() => ({
+          isMockApiLoading: true,
+          mockApiError: null,
+        }))
+
+        try {
+          const transactions = await fetchMockTransactions()
+
+          set(() => ({
+            transactions,
+            isMockApiLoading: false,
+            mockApiError: null,
+            editingTransactionId: null,
+          }))
+        } catch (error) {
+          set(() => ({
+            isMockApiLoading: false,
+            mockApiError:
+              error instanceof Error
+                ? error.message
+                : 'Mock API request failed.',
+          }))
+        }
       },
     }),
     {
@@ -136,6 +172,8 @@ export const useFinanceStore = create<FinanceStore>()(
         ...(persistedState as Partial<FinanceStore>),
         filters: createDefaultFilters(),
         editingTransactionId: null,
+        isMockApiLoading: false,
+        mockApiError: null,
       }),
     },
   ),

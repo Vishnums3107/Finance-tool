@@ -32,7 +32,8 @@ Frontend finance dashboard built for internship assessment evaluation.
 1. Transaction table with date, amount, category, type, description.
 2. Real-time search by category/description.
 3. Filter by type, category, and month.
-4. Sorting controls for date/amount/category/description/type.
+4. Advanced filters with amount range and grouping mode.
+5. Sorting controls for date/amount/category/description/type.
 
 ### Role-Based UI
 
@@ -49,9 +50,11 @@ Frontend finance dashboard built for internship assessment evaluation.
 
 1. Dark mode toggle with persisted preference.
 2. Local storage persistence.
-3. CSV export for filtered transactions.
-4. Motion and staged reveal animations.
-5. No-data recovery banner with demo restore action.
+3. Mock API integration with loading/error handling.
+4. CSV and JSON export for filtered transactions.
+5. Motion and staged reveal animations.
+6. Advanced filtering and grouping support.
+7. No-data recovery banner with demo restore action.
 
 ## Project Structure
 

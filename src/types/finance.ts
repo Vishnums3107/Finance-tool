@@ -23,13 +23,27 @@ export type SortField = 'date' | 'amount' | 'category' | 'description' | 'type'
 
 export type SortDirection = 'asc' | 'desc'
 
+export type TransactionGroupBy = 'none' | 'category' | 'month' | 'type'
+
 export interface TransactionFilters {
   search: string
   type: 'all' | TransactionType
   category: 'all' | string
   month: 'all' | string
+  minAmount: number | null
+  maxAmount: number | null
+  groupBy: TransactionGroupBy
   sortBy: SortField
   sortDir: SortDirection
+}
+
+export interface TransactionGroupSummary {
+  groupKey: string
+  label: string
+  count: number
+  income: number
+  expenses: number
+  net: number
 }
 
 export interface MonthlyTrendPoint {

@@ -1,3 +1,6 @@
+import { useMemo } from 'react'
+import { formatCurrency } from '../lib/format'
+import { getGroupedTransactionSummaries } from '../lib/transactions'
 import type {
   Transaction,
   TransactionFilters,
@@ -31,7 +34,15 @@ export const TransactionsSection = ({
     filters.search.trim().length > 0 ||
     filters.type !== 'all' ||
     filters.category !== 'all' ||
-    filters.month !== 'all'
+    filters.month !== 'all' ||
+    filters.minAmount !== null ||
+    filters.maxAmount !== null ||
+    filters.groupBy !== 'none'
+
+  const groupedSummaries = useMemo(
+    () => getGroupedTransactionSummaries(transactions, filters.groupBy),
+    [transactions, filters.groupBy],
+  )
 
   return (
     <section className="panel transactions-panel reveal delay-2">
@@ -61,6 +72,20 @@ export const TransactionsSection = ({
         onUpdateFilters={onUpdateFilters}
         onReset={onResetFilters}
       />
+
+      {groupedSummaries.length > 0 && (
+        <div className="grouping-grid" aria-label="Grouped transaction summaries">
+          {groupedSummaries.map((summary) => (
+            <article key={summary.groupKey} className="grouping-card">
+              <h3>{summary.label}</h3>
+              <p>{summary.count} transactions</p>
+              <small>Income: {formatCurrency(summary.income)}</small>
+              <small>Expenses: {formatCurrency(summary.expenses)}</small>
+              <small>Net: {formatCurrency(summary.net)}</small>
+            </article>
+          ))}
+        </div>
+      )}
 
       <TransactionTable
         role={role}

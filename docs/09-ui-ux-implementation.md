@@ -38,8 +38,10 @@ Implemented with:
 
 1. Dark mode toggle with persistent preference.
 2. Local storage persistence for role, transaction data, and UI preferences.
-3. Animated section reveal transitions.
-4. CSV export for filtered transactions.
+3. Mock API integration with loading and error recovery handling.
+4. Animated section reveal transitions.
+5. CSV and JSON export for filtered transactions.
+6. Advanced filtering and grouping controls for transaction analysis.
 
 ## Validation Checklist
 

@@ -17,6 +17,8 @@ export const useFinanceDashboardState = () => {
   const transactions = useFinanceStore((state) => state.transactions)
   const filters = useFinanceStore((state) => state.filters)
   const editingTransactionId = useFinanceStore((state) => state.editingTransactionId)
+  const isMockApiLoading = useFinanceStore((state) => state.isMockApiLoading)
+  const mockApiError = useFinanceStore((state) => state.mockApiError)
 
   const setRole = useFinanceStore((state) => state.setRole)
   const setFilters = useFinanceStore((state) => state.setFilters)
@@ -30,6 +32,9 @@ export const useFinanceDashboardState = () => {
   const addTransaction = useFinanceStore((state) => state.addTransaction)
   const updateTransaction = useFinanceStore((state) => state.updateTransaction)
   const restoreDemoData = useFinanceStore((state) => state.restoreDemoData)
+  const loadTransactionsFromMockApi = useFinanceStore(
+    (state) => state.loadTransactionsFromMockApi,
+  )
 
   const filteredTransactions = useMemo(
     () => filterAndSortTransactions(transactions, filters),
@@ -73,6 +78,18 @@ export const useFinanceDashboardState = () => {
       count += 1
     }
 
+    if (filters.minAmount !== null) {
+      count += 1
+    }
+
+    if (filters.maxAmount !== null) {
+      count += 1
+    }
+
+    if (filters.groupBy !== 'none') {
+      count += 1
+    }
+
     return count
   }, [filters])
 
@@ -84,6 +101,8 @@ export const useFinanceDashboardState = () => {
     transactionCount: transactions.length,
     filters,
     editingTransaction,
+    isMockApiLoading,
+    mockApiError,
     filteredTransactions,
     summary,
     monthlyTrend,
@@ -101,5 +120,6 @@ export const useFinanceDashboardState = () => {
     addTransaction,
     updateTransaction,
     restoreDemoData,
+    loadTransactionsFromMockApi,
   }
 }

@@ -1,5 +1,10 @@
-import { getMonthKey, normalizeSearch } from './format'
-import type { Transaction, TransactionFilters } from '../types/finance'
+import { formatMonthLabel, getMonthKey, normalizeSearch } from './format'
+import type {
+  Transaction,
+  TransactionFilters,
+  TransactionGroupBy,
+  TransactionGroupSummary,
+} from '../types/finance'
 
 const asSignedAmount = (transaction: Transaction) =>
   transaction.type === 'income' ? transaction.amount : -transaction.amount
@@ -25,7 +30,20 @@ export const filterAndSortTransactions = (
     const monthMatch =
       filters.month === 'all' || getMonthKey(transaction.date) === filters.month
 
-    return searchMatch && typeMatch && categoryMatch && monthMatch
+    const minAmountMatch =
+      filters.minAmount === null || transaction.amount >= filters.minAmount
+
+    const maxAmountMatch =
+      filters.maxAmount === null || transaction.amount <= filters.maxAmount
+
+    return (
+      searchMatch &&
+      typeMatch &&
+      categoryMatch &&
+      monthMatch &&
+      minAmountMatch &&
+      maxAmountMatch
+    )
   })
 
   const sorted = filtered.sort((a, b) => {
@@ -55,6 +73,77 @@ export const filterAndSortTransactions = (
   })
 
   return sorted
+}
+
+export const getGroupedTransactionSummaries = (
+  transactions: Transaction[],
+  groupBy: TransactionGroupBy,
+): TransactionGroupSummary[] => {
+  if (groupBy === 'none') {
+    return []
+  }
+
+  const grouped = new Map<
+    string,
+    {
+      label: string
+      count: number
+      income: number
+      expenses: number
+    }
+  >()
+
+  transactions.forEach((transaction) => {
+    let groupKey = ''
+    let label = ''
+
+    if (groupBy === 'category') {
+      groupKey = transaction.category
+      label = transaction.category
+    }
+
+    if (groupBy === 'type') {
+      groupKey = transaction.type
+      label = transaction.type === 'income' ? 'Income' : 'Expense'
+    }
+
+    if (groupBy === 'month') {
+      groupKey = getMonthKey(transaction.date)
+      label = formatMonthLabel(groupKey)
+    }
+
+    const existing = grouped.get(groupKey) ?? {
+      label,
+      count: 0,
+      income: 0,
+      expenses: 0,
+    }
+
+    existing.count += 1
+
+    if (transaction.type === 'income') {
+      existing.income += transaction.amount
+    } else {
+      existing.expenses += transaction.amount
+    }
+
+    grouped.set(groupKey, existing)
+  })
+
+  const summaries = Array.from(grouped.entries()).map(([groupKey, value]) => ({
+    groupKey,
+    label: value.label,
+    count: value.count,
+    income: value.income,
+    expenses: value.expenses,
+    net: value.income - value.expenses,
+  }))
+
+  if (groupBy === 'month') {
+    return summaries.sort((a, b) => a.groupKey.localeCompare(b.groupKey))
+  }
+
+  return summaries.sort((a, b) => b.net - a.net)
 }
 
 export const getUniqueCategories = (transactions: Transaction[]) =>

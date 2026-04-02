@@ -1,5 +1,16 @@
 import type { Transaction } from '../types/finance'
 
+const downloadBlob = (blob: Blob, fileName: string) => {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+
+  link.href = url
+  link.download = fileName
+  link.click()
+
+  URL.revokeObjectURL(url)
+}
+
 const escapeCsvValue = (value: string | number) => {
   const asText = String(value)
 
@@ -29,16 +40,34 @@ export const exportTransactionsCsv = (transactions: Transaction[]) => {
     .map((row) => row.map((cell) => escapeCsvValue(cell)).join(','))
     .join('\n')
 
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
   const timestamp = new Date().toISOString().slice(0, 10)
 
-  link.href = url
-  link.download = `transactions-${timestamp}.csv`
-  link.click()
+  downloadBlob(
+    new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
+    `transactions-${timestamp}.csv`,
+  )
 
-  URL.revokeObjectURL(url)
+  return true
+}
+
+export const exportTransactionsJson = (transactions: Transaction[]) => {
+  if (transactions.length === 0) {
+    return false
+  }
+
+  const timestamp = new Date().toISOString().slice(0, 10)
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    count: transactions.length,
+    transactions,
+  }
+
+  downloadBlob(
+    new Blob([JSON.stringify(payload, null, 2)], {
+      type: 'application/json;charset=utf-8;',
+    }),
+    `transactions-${timestamp}.json`,
+  )
 
   return true
 }

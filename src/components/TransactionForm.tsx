@@ -61,7 +61,14 @@ export const TransactionForm = ({
     return !categoryOptions.includes(editingTransaction.category)
   })
 
+  const [formError, setFormError] = useState<string | null>(null)
+
   const mode = editingTransaction ? 'edit' : 'create'
+
+  const updateDraft = (updater: (current: TransactionDraft) => TransactionDraft) => {
+    setFormError(null)
+    setDraft(updater)
+  }
 
   if (role === 'viewer') {
     return (
@@ -84,13 +91,21 @@ export const TransactionForm = ({
         const amount = Number(draft.amount)
 
         if (!draft.description.trim() || !draft.category.trim() || Number.isNaN(amount) || amount <= 0) {
+          setFormError('Enter a valid description, category, and amount greater than 0.')
           return
         }
+
+        setFormError(null)
 
         onSubmit({
           ...draft,
           amount,
         })
+
+        if (mode === 'create') {
+          setDraft(getInitialDraft(null, categoryOptions))
+          setCustomCategoryEnabled(categoryOptions.length === 0)
+        }
       }}
     >
       <h3>{mode === 'edit' ? 'Edit Transaction' : 'Add Transaction'}</h3>
@@ -101,7 +116,7 @@ export const TransactionForm = ({
           type="date"
           value={draft.date}
           onChange={(event) =>
-            setDraft((current) => ({
+            updateDraft((current) => ({
               ...current,
               date: event.target.value,
             }))
@@ -117,7 +132,7 @@ export const TransactionForm = ({
           value={draft.description}
           placeholder="Example: Grocery run"
           onChange={(event) =>
-            setDraft((current) => ({
+            updateDraft((current) => ({
               ...current,
               description: event.target.value,
             }))
@@ -134,7 +149,7 @@ export const TransactionForm = ({
           min={1}
           step={1}
           onChange={(event) =>
-            setDraft((current) => ({
+            updateDraft((current) => ({
               ...current,
               amount: Number(event.target.value),
             }))
@@ -149,6 +164,7 @@ export const TransactionForm = ({
           value={customCategoryEnabled ? '__custom__' : draft.category}
           onChange={(event) => {
             const selectedValue = event.target.value
+            setFormError(null)
 
             if (selectedValue === '__custom__') {
               setCustomCategoryEnabled(true)
@@ -190,7 +206,7 @@ export const TransactionForm = ({
             value={draft.category}
             placeholder="Enter custom category"
             onChange={(event) =>
-              setDraft((current) => ({
+              updateDraft((current) => ({
                 ...current,
                 category: event.target.value,
               }))
@@ -205,7 +221,7 @@ export const TransactionForm = ({
         <select
           value={draft.type}
           onChange={(event) =>
-            setDraft((current) => ({
+            updateDraft((current) => ({
               ...current,
               type: event.target.value as TransactionDraft['type'],
             }))
@@ -215,6 +231,12 @@ export const TransactionForm = ({
           <option value="income">Income</option>
         </select>
       </label>
+
+      {formError && (
+        <p className="form-error" role="alert">
+          {formError}
+        </p>
+      )}
 
       <div className="form-actions">
         <button type="submit" className="primary-button">

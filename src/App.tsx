@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ActionStatusBanner } from './components/ActionStatusBanner'
 import { DashboardOverview } from './components/DashboardOverview'
 import { DateRangeSelectorMock } from './components/DateRangeSelectorMock'
@@ -8,7 +8,18 @@ import { RoleBasedAccessSection } from './components/RoleBasedAccessSection'
 import { StateManagementSection } from './components/StateManagementSection'
 import { ThemeToggle } from './components/ThemeToggle'
 import { TransactionsSection } from './components/TransactionsSection'
-import { dateRangePresetLabels, type DateRangePreset } from './lib/dateRange'
+import {
+  dateRangePresetLabels,
+  filterByDateRangePreset,
+  getLatestTransactionDate,
+  type DateRangePreset,
+} from './lib/dateRange'
+import {
+  getCategoryBreakdown,
+  getFinanceSummary,
+  getInsights,
+  getMonthlyTrend,
+} from './lib/analytics'
 import { exportTransactionsCsv, exportTransactionsJson } from './lib/export'
 import { formatCount } from './lib/format'
 import { useFinanceDashboardState } from './store/useFinanceDashboardState'
@@ -24,16 +35,13 @@ function App() {
 
   const {
     role,
+    transactions,
     filters,
     editingTransaction,
     transactionCount,
     isMockApiLoading,
     mockApiError,
     filteredTransactions,
-    summary,
-    monthlyTrend,
-    categoryBreakdown,
-    insights,
     categories,
     months,
     activeFilterCount,
@@ -75,7 +83,53 @@ function App() {
     loadTransactionsFromMockApi,
   ])
 
-  const latestMonth = monthlyTrend[monthlyTrend.length - 1]?.monthLabel ?? 'N/A'
+  const dateRangeReferenceDate = useMemo(
+    () => getLatestTransactionDate(transactions),
+    [transactions],
+  )
+
+  const rangeTransactions = useMemo(
+    () =>
+      filterByDateRangePreset(
+        transactions,
+        reportingRange,
+        dateRangeReferenceDate,
+      ),
+    [transactions, reportingRange, dateRangeReferenceDate],
+  )
+
+  const rangeFilteredTransactions = useMemo(
+    () =>
+      filterByDateRangePreset(
+        filteredTransactions,
+        reportingRange,
+        dateRangeReferenceDate,
+      ),
+    [filteredTransactions, reportingRange, dateRangeReferenceDate],
+  )
+
+  const rangeSummary = useMemo(
+    () => getFinanceSummary(rangeTransactions),
+    [rangeTransactions],
+  )
+
+  const rangeMonthlyTrend = useMemo(
+    () => getMonthlyTrend(rangeTransactions),
+    [rangeTransactions],
+  )
+
+  const rangeCategoryBreakdown = useMemo(
+    () => getCategoryBreakdown(rangeTransactions),
+    [rangeTransactions],
+  )
+
+  const rangeInsights = useMemo(
+    () => getInsights(rangeTransactions),
+    [rangeTransactions],
+  )
+
+  const latestMonth =
+    rangeMonthlyTrend[rangeMonthlyTrend.length - 1]?.monthLabel ?? 'N/A'
   const hasNoTransactions = transactionCount === 0
   const mockApiStatus = isMockApiLoading
     ? 'Loading'
@@ -100,7 +154,7 @@ function App() {
   }
 
   const handleCsvExport = () => {
-    const exported = exportTransactionsCsv(filteredTransactions)
+    const exported = exportTransactionsCsv(rangeFilteredTransactions)
 
     showActionStatus(
       exported ? 'CSV export completed.' : 'No records to export to CSV.',
@@ -109,7 +163,7 @@ function App() {
   }
 
   const handleJsonExport = () => {
-    const exported = exportTransactionsJson(filteredTransactions)
+    const exported = exportTransactionsJson(rangeFilteredTransactions)
 
     showActionStatus(
       exported ? 'JSON export completed.' : 'No records to export to JSON.',
@@ -140,6 +194,9 @@ function App() {
           <div className="topbar-meta">
             <span className="meta-chip">Reporting Month: {latestMonth}</span>
             <span className="meta-chip">Transactions: {formatCount(transactionCount)}</span>
+            <span className="meta-chip">
+              In Range: {formatCount(rangeTransactions.length)}
+            </span>
             <span className="meta-chip">Active Filters: {activeFilterCount}</span>
             <span className="meta-chip">Mock API: {mockApiStatus}</span>
           </div>
@@ -160,10 +217,10 @@ function App() {
               type="button"
               className="primary-button"
               onClick={handleCsvExport}
-              disabled={!canManageTransactions || filteredTransactions.length === 0}
+              disabled={!canManageTransactions || rangeFilteredTransactions.length === 0}
               title={
                 canManageTransactions
-                  ? 'Export filtered transactions to CSV'
+                  ? 'Export transactions in the current filter and date range to CSV'
                   : 'Viewer mode is read-only. Switch to Admin to export.'
               }
             >
@@ -174,10 +231,10 @@ function App() {
               type="button"
               className="ghost-button"
               onClick={handleJsonExport}
-              disabled={!canManageTransactions || filteredTransactions.length === 0}
+              disabled={!canManageTransactions || rangeFilteredTransactions.length === 0}
               title={
                 canManageTransactions
-                  ? 'Export filtered transactions to JSON'
+                  ? 'Export transactions in the current filter and date range to JSON'
                   : 'Viewer mode is read-only. Switch to Admin to export.'
               }
             >
@@ -220,9 +277,9 @@ function App() {
         )}
 
         <DashboardOverview
-          summary={summary}
-          monthlyTrend={monthlyTrend}
-          categoryBreakdown={categoryBreakdown}
+          summary={rangeSummary}
+          monthlyTrend={rangeMonthlyTrend}
+          categoryBreakdown={rangeCategoryBreakdown}
         />
 
         <TransactionsSection
@@ -230,7 +287,7 @@ function App() {
           filters={filters}
           categories={categories}
           months={months}
-          transactions={filteredTransactions}
+          transactions={rangeFilteredTransactions}
           onUpdateFilters={setFilters}
           onResetFilters={resetFilters}
           onEditTransaction={(transactionId) => {
@@ -264,7 +321,7 @@ function App() {
             onCancelEdit={clearEditingTransaction}
           />
 
-          <InsightsSection insights={insights} />
+          <InsightsSection insights={rangeInsights} />
 
           <StateManagementSection
             role={role}

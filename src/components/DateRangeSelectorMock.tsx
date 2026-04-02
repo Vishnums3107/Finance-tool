@@ -17,7 +17,7 @@ export const DateRangeSelectorMock = ({
   onChange,
 }: DateRangeSelectorMockProps) => {
   return (
-    <label className="date-range-switcher" title="UI mock control only">
+    <label className="date-range-switcher" title="Filter dashboard data by date range">
       <span className="control-label">Date Range</span>
       <select
         value={value}

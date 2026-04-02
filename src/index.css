@@ -562,6 +562,36 @@ tfoot td {
   color: var(--ink-700);
 }
 
+.state-summary-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.state-summary-grid article {
+  border: 1px solid #d8e2ea;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 10px;
+  display: grid;
+  gap: 4px;
+}
+
+.state-summary-grid article p {
+  font-weight: 700;
+  color: var(--ink-900);
+}
+
+.state-summary-grid article small {
+  color: var(--ink-700);
+  font-size: 0.8rem;
+}
+
+.state-note {
+  margin-top: 10px;
+  color: var(--ink-700);
+  font-size: 0.85rem;
+}
+
 .trend-pill {
   display: inline-flex;
   width: fit-content;
@@ -784,6 +814,10 @@ tfoot td {
 
   .table-note {
     margin-top: 8px;
+  }
+
+  .state-summary-grid article {
+    padding: 9px;
   }
 }
 

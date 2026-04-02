@@ -16,14 +16,16 @@ const createTransactionId = () => {
   return `tx-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
-export const defaultFilters: TransactionFilters = {
+const createDefaultFilters = (): TransactionFilters => ({
   search: '',
   type: 'all',
   category: 'all',
   month: 'all',
   sortBy: 'date',
   sortDir: 'desc',
-}
+})
+
+export const defaultFilters: TransactionFilters = createDefaultFilters()
 
 interface FinanceStore {
   role: UserRole
@@ -34,6 +36,7 @@ interface FinanceStore {
   setFilters: (partialFilters: Partial<TransactionFilters>) => void
   resetFilters: () => void
   setEditingTransactionId: (transactionId: string | null) => void
+  clearEditingTransaction: () => void
   addTransaction: (draft: TransactionDraft) => void
   updateTransaction: (id: string, draft: TransactionDraft) => void
 }
@@ -43,7 +46,7 @@ export const useFinanceStore = create<FinanceStore>()(
     (set) => ({
       role: 'viewer',
       transactions: seedTransactions,
-      filters: defaultFilters,
+      filters: createDefaultFilters(),
       editingTransactionId: null,
       setRole: (role) => {
         set(() => ({ role, editingTransactionId: null }))
@@ -57,10 +60,19 @@ export const useFinanceStore = create<FinanceStore>()(
         }))
       },
       resetFilters: () => {
-        set(() => ({ filters: defaultFilters }))
+        set(() => ({ filters: createDefaultFilters() }))
       },
       setEditingTransactionId: (editingTransactionId) => {
-        set(() => ({ editingTransactionId }))
+        set((state) => {
+          if (state.role !== 'admin') {
+            return { editingTransactionId: null }
+          }
+
+          return { editingTransactionId }
+        })
+      },
+      clearEditingTransaction: () => {
+        set(() => ({ editingTransactionId: null }))
       },
       addTransaction: (draft) => {
         set((state) => {
@@ -114,7 +126,7 @@ export const useFinanceStore = create<FinanceStore>()(
       merge: (persistedState, currentState) => ({
         ...currentState,
         ...(persistedState as Partial<FinanceStore>),
-        filters: defaultFilters,
+        filters: createDefaultFilters(),
         editingTransactionId: null,
       }),
     },

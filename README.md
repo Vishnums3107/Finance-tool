@@ -106,6 +106,7 @@ Full requirement and evaluation mapping documents:
 2. [docs/01-system-architecture.md](docs/01-system-architecture.md)
 3. [docs/06-evaluation-mapping.md](docs/06-evaluation-mapping.md)
 4. [docs/07-git-progress-tracking.md](docs/07-git-progress-tracking.md)
+5. [docs/08-state-management-implementation.md](docs/08-state-management-implementation.md)
 
 ## Notes
 

@@ -15,6 +15,14 @@ export const filterAndSortTransactions = (
 ) => {
   const search = normalizeSearch(filters.search)
 
+  let normalizedMinAmount = filters.minAmount
+  let normalizedMaxAmount = filters.maxAmount
+
+  if (filters.minAmount !== null && filters.maxAmount !== null) {
+    normalizedMinAmount = Math.min(filters.minAmount, filters.maxAmount)
+    normalizedMaxAmount = Math.max(filters.minAmount, filters.maxAmount)
+  }
+
   const filtered = transactions.filter((transaction) => {
     const searchMatch =
       search.length === 0 ||
@@ -31,10 +39,10 @@ export const filterAndSortTransactions = (
       filters.month === 'all' || getMonthKey(transaction.date) === filters.month
 
     const minAmountMatch =
-      filters.minAmount === null || transaction.amount >= filters.minAmount
+      normalizedMinAmount === null || transaction.amount >= normalizedMinAmount
 
     const maxAmountMatch =
-      filters.maxAmount === null || transaction.amount <= filters.maxAmount
+      normalizedMaxAmount === null || transaction.amount <= normalizedMaxAmount
 
     return (
       searchMatch &&

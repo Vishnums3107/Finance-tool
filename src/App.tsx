@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { ActionStatusBanner } from './components/ActionStatusBanner'
 import { DashboardOverview } from './components/DashboardOverview'
 import { DateRangeSelectorMock } from './components/DateRangeSelectorMock'
 import { InsightsSection } from './components/InsightsSection'
@@ -15,6 +16,11 @@ import { useUiPreferencesStore } from './store/useUiPreferencesStore'
 
 function App() {
   const [reportingRange, setReportingRange] = useState<DateRangePreset>('qtd')
+  const [actionStatus, setActionStatus] = useState<{
+    message: string
+    tone: 'info' | 'success' | 'error'
+  } | null>(null)
+  const statusTimeoutRef = useRef<number | null>(null)
 
   const {
     role,
@@ -51,6 +57,14 @@ function App() {
   }, [themeMode])
 
   useEffect(() => {
+    return () => {
+      if (statusTimeoutRef.current !== null) {
+        window.clearTimeout(statusTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
     if (transactionCount === 0 && !isMockApiLoading && mockApiError === null) {
       void loadTransactionsFromMockApi()
     }
@@ -68,6 +82,51 @@ function App() {
     : mockApiError
       ? 'Error'
       : 'Ready'
+
+  const showActionStatus = (
+    message: string,
+    tone: 'info' | 'success' | 'error',
+  ) => {
+    if (statusTimeoutRef.current !== null) {
+      window.clearTimeout(statusTimeoutRef.current)
+    }
+
+    setActionStatus({ message, tone })
+
+    statusTimeoutRef.current = window.setTimeout(() => {
+      setActionStatus(null)
+      statusTimeoutRef.current = null
+    }, 2400)
+  }
+
+  const handleCsvExport = () => {
+    const exported = exportTransactionsCsv(filteredTransactions)
+
+    showActionStatus(
+      exported ? 'CSV export completed.' : 'No records to export to CSV.',
+      exported ? 'success' : 'info',
+    )
+  }
+
+  const handleJsonExport = () => {
+    const exported = exportTransactionsJson(filteredTransactions)
+
+    showActionStatus(
+      exported ? 'JSON export completed.' : 'No records to export to JSON.',
+      exported ? 'success' : 'info',
+    )
+  }
+
+  const handleMockApiSync = async () => {
+    const isSuccessful = await loadTransactionsFromMockApi()
+
+    showActionStatus(
+      isSuccessful
+        ? 'Mock API data synced successfully.'
+        : 'Mock API sync failed. Use Restore Demo Data as fallback.',
+      isSuccessful ? 'success' : 'error',
+    )
+  }
 
   return (
     <div className="app-shell">
@@ -100,7 +159,7 @@ function App() {
             <button
               type="button"
               className="primary-button"
-              onClick={() => exportTransactionsCsv(filteredTransactions)}
+              onClick={handleCsvExport}
               disabled={!canManageTransactions || filteredTransactions.length === 0}
               title={
                 canManageTransactions
@@ -114,7 +173,7 @@ function App() {
             <button
               type="button"
               className="ghost-button"
-              onClick={() => exportTransactionsJson(filteredTransactions)}
+              onClick={handleJsonExport}
               disabled={!canManageTransactions || filteredTransactions.length === 0}
               title={
                 canManageTransactions
@@ -124,9 +183,28 @@ function App() {
             >
               Export JSON
             </button>
+
+            <button
+              type="button"
+              className="ghost-button sync-button"
+              onClick={() => {
+                void handleMockApiSync()
+              }}
+              disabled={isMockApiLoading}
+              title="Refresh transaction dataset from mock API"
+            >
+              {isMockApiLoading ? 'Syncing...' : 'Sync Mock API'}
+            </button>
           </div>
         </div>
       </header>
+
+      {actionStatus && (
+        <ActionStatusBanner
+          message={actionStatus.message}
+          tone={actionStatus.tone}
+        />
+      )}
 
       <main className="layout-grid">
         {hasNoTransactions && (
@@ -135,7 +213,7 @@ function App() {
             isMockApiLoading={isMockApiLoading}
             mockApiError={mockApiError}
             onLoadFromMockApi={() => {
-              void loadTransactionsFromMockApi()
+              void handleMockApiSync()
             }}
             onRestoreDemoData={restoreDemoData}
           />

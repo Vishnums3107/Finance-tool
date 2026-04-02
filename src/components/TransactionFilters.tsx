@@ -57,6 +57,11 @@ export const TransactionFiltersBar = ({
   onUpdateFilters,
   onReset,
 }: TransactionFiltersProps) => {
+  const hasRangeNormalization =
+    filters.minAmount !== null &&
+    filters.maxAmount !== null &&
+    filters.minAmount > filters.maxAmount
+
   return (
     <div className="filters-grid">
       <label>
@@ -212,6 +217,12 @@ export const TransactionFiltersBar = ({
       <button type="button" className="ghost-button" onClick={onReset}>
         Reset Filters
       </button>
+
+      {hasRangeNormalization && (
+        <p className="filters-note">
+          Amount range was normalized automatically because minimum was greater than maximum.
+        </p>
+      )}
     </div>
   )
 }

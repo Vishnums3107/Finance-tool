@@ -46,7 +46,7 @@ interface FinanceStore {
   addTransaction: (draft: TransactionDraft) => void
   updateTransaction: (id: string, draft: TransactionDraft) => void
   restoreDemoData: () => void
-  loadTransactionsFromMockApi: () => Promise<void>
+  loadTransactionsFromMockApi: () => Promise<boolean>
 }
 
 export const useFinanceStore = create<FinanceStore>()(
@@ -149,6 +149,8 @@ export const useFinanceStore = create<FinanceStore>()(
             mockApiError: null,
             editingTransactionId: null,
           }))
+
+          return true
         } catch (error) {
           set(() => ({
             isMockApiLoading: false,
@@ -157,6 +159,8 @@ export const useFinanceStore = create<FinanceStore>()(
                 ? error.message
                 : 'Mock API request failed.',
           }))
+
+          return false
         }
       },
     }),

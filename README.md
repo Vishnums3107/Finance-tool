@@ -113,6 +113,7 @@ Full requirement and evaluation mapping documents:
 4. [docs/07-git-progress-tracking.md](docs/07-git-progress-tracking.md)
 5. [docs/08-state-management-implementation.md](docs/08-state-management-implementation.md)
 6. [docs/09-ui-ux-implementation.md](docs/09-ui-ux-implementation.md)
+7. [docs/10-optional-enhancements-implementation.md](docs/10-optional-enhancements-implementation.md)
 
 ## Notes
 

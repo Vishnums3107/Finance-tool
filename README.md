@@ -55,6 +55,8 @@ Frontend finance dashboard built for internship assessment evaluation.
 5. Motion and staged reveal animations.
 6. Advanced filtering and grouping support.
 7. No-data recovery banner with demo restore action.
+8. Component and utility automated tests with Vitest & React Testing Library.
+9. Production build code splitting for reduced bundle size.
 
 ## Project Structure
 

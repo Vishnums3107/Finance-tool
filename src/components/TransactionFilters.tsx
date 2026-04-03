@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+import { useDebounce } from '../hooks/useDebounce'
 import { formatMonthLabel } from '../lib/format'
 import type {
   SortDirection,
@@ -57,6 +59,21 @@ export const TransactionFiltersBar = ({
   onUpdateFilters,
   onReset,
 }: TransactionFiltersProps) => {
+  const [localSearch, setLocalSearch] = useState(filters.search)
+  const debouncedSearch = useDebounce(localSearch, 300)
+
+  // Sync external search clears (like Reset)
+  useEffect(() => {
+    setLocalSearch(filters.search)
+  }, [filters.search])
+
+  // Fire update to parent when debounced value changes (only if different)
+  useEffect(() => {
+    if (debouncedSearch !== filters.search) {
+      onUpdateFilters({ search: debouncedSearch })
+    }
+  }, [debouncedSearch, filters.search, onUpdateFilters])
+
   const hasRangeNormalization =
     filters.minAmount !== null &&
     filters.maxAmount !== null &&
@@ -69,8 +86,8 @@ export const TransactionFiltersBar = ({
         <input
           type="text"
           placeholder="Search description or category"
-          value={filters.search}
-          onChange={(event) => onUpdateFilters({ search: event.target.value })}
+          value={localSearch}
+          onChange={(event) => setLocalSearch(event.target.value)}
         />
       </label>
 

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react'
 import { ActionStatusBanner } from './components/ActionStatusBanner'
 import { DateRangeSelectorMock } from './components/DateRangeSelectorMock'
+import { FinancialHealthGauge } from './components/FinancialHealthGauge'
 import { InsightsSection } from './components/InsightsSection'
 import { NoDataBanner } from './components/NoDataBanner'
 import { RoleStatusPanel } from './components/RoleStatusPanel'
@@ -26,6 +27,7 @@ import {
 } from './lib/analytics'
 import { exportTransactionsCsv, exportTransactionsJson } from './lib/export'
 import { formatCount } from './lib/format'
+import { computeHealthScore } from './lib/healthScore'
 import { useFinanceDashboardState } from './store/useFinanceDashboardState'
 import { useUiPreferencesStore } from './store/useUiPreferencesStore'
 
@@ -130,6 +132,11 @@ function App() {
   const rangeInsights = useMemo(
     () => getInsights(rangeTransactions),
     [rangeTransactions],
+  )
+
+  const rangeHealthScore = useMemo(
+    () => computeHealthScore(rangeSummary, rangeTransactions),
+    [rangeSummary, rangeTransactions],
   )
 
   const latestMonth =
@@ -317,6 +324,8 @@ function App() {
             }}
             onCancelEdit={clearEditingTransaction}
           />
+
+          <FinancialHealthGauge healthScore={rangeHealthScore} />
         </div>
 
         {/* 3. Deep Data Table (Full Width for max readability) */}

@@ -457,24 +457,9 @@ button:disabled {
 
 .context-split {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 32px;
   align-items: stretch;
-}
-
-/* Each direct child panel inside context-split fills its cell fully */
-.context-split > section {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-/* Transaction form panel stretches its inner form to fill space */
-.transaction-form-panel .transaction-form {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
 }
 
 .footer-debug {
@@ -1009,10 +994,101 @@ tbody tr:hover .pill {
   100% { transform: translate(150px, -100px); }
 }
 
+/* ─── Financial Health Gauge ────────────────────────────── */
+.health-gauge-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gauge-container {
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto 20px;
+}
+
+.gauge-svg {
+  width: 100%;
+  height: auto;
+}
+
+.gauge-score-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.gauge-label-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.gauge-sublabel-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.health-factors {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.health-factor-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.factor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.factor-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.factor-score {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.factor-bar-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.factor-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.factor-tip {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.4;
+  font-style: italic;
+}
+
 /* Responsiveness */
 @media (min-width: 1024px) {
   .context-split {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -1020,7 +1096,6 @@ tbody tr:hover .pill {
   .topbar { grid-template-columns: 1fr; }
   .charts-grid { grid-template-columns: 1fr; }
   .filters-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .context-split { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 768px) {
@@ -1031,7 +1106,6 @@ tbody tr:hover .pill {
   .filters-grid { grid-template-columns: 1fr; }
   .summary-grid { grid-template-columns: 1fr; }
   .form-actions { flex-direction: column; }
-  .context-split { grid-template-columns: 1fr; }
 }
 
 @media print {

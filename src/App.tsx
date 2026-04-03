@@ -263,7 +263,7 @@ function App() {
         />
       )}
 
-      <main className="layout-grid">
+      <main className="layout-stack">
         {hasNoTransactions && (
           <NoDataBanner
             role={role}
@@ -276,30 +276,17 @@ function App() {
           />
         )}
 
+        {/* 1. Top Level Metrics (Full Width) */}
         <DashboardOverview
           summary={rangeSummary}
           monthlyTrend={rangeMonthlyTrend}
           categoryBreakdown={rangeCategoryBreakdown}
         />
 
-        <TransactionsSection
-          role={role}
-          filters={filters}
-          categories={categories}
-          months={months}
-          transactions={rangeFilteredTransactions}
-          onUpdateFilters={setFilters}
-          onResetFilters={resetFilters}
-          onEditTransaction={(transactionId) => {
-            if (!canManageTransactions) {
-              return
-            }
-
-            setEditingTransactionId(transactionId)
-          }}
-        />
-
-        <aside className="side-stack">
+        {/* 2. Middle Contextual Split (Insights + Controls) */}
+        <div className="context-split">
+          <InsightsSection insights={rangeInsights} />
+          
           <RoleBasedAccessSection
             role={role}
             categories={categories}
@@ -320,16 +307,35 @@ function App() {
             }}
             onCancelEdit={clearEditingTransaction}
           />
+        </div>
 
-          <InsightsSection insights={rangeInsights} />
+        {/* 3. Deep Data Table (Full Width for max readability) */}
+        <TransactionsSection
+          role={role}
+          filters={filters}
+          categories={categories}
+          months={months}
+          transactions={rangeFilteredTransactions}
+          onUpdateFilters={setFilters}
+          onResetFilters={resetFilters}
+          onEditTransaction={(transactionId) => {
+            if (!canManageTransactions) {
+              return
+            }
 
+            setEditingTransactionId(transactionId)
+          }}
+        />
+
+        {/* 4. Footer Debug Area */}
+        <div className="footer-debug">
           <StateManagementSection
             role={role}
             transactionCount={transactionCount}
             activeFilterCount={activeFilterCount}
             filters={filters}
           />
-        </aside>
+        </div>
       </main>
     </div>
   )

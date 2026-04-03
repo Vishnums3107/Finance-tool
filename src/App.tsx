@@ -4,6 +4,7 @@ import { DateRangeSelectorMock } from './components/DateRangeSelectorMock'
 import { InsightsSection } from './components/InsightsSection'
 import { NoDataBanner } from './components/NoDataBanner'
 import { RoleBasedAccessSection } from './components/RoleBasedAccessSection'
+import { RoleSwitcher } from './components/RoleSwitcher'
 import { StateManagementSection } from './components/StateManagementSection'
 import { ThemeToggle } from './components/ThemeToggle'
 
@@ -208,6 +209,7 @@ function App() {
         </div>
 
         <div className="topbar-actions screen-only">
+          <RoleSwitcher role={role} onChangeRole={setRole} />
           <ThemeToggle themeMode={themeMode} onToggle={toggleThemeMode} />
           <DateRangeSelectorMock
             value={reportingRange}
@@ -295,7 +297,6 @@ function App() {
             role={role}
             categories={categories}
             editingTransaction={editingTransaction}
-            onChangeRole={setRole}
             onSubmitTransaction={(draft) => {
               if (!canManageTransactions) {
                 return

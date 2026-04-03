@@ -1,12 +1,10 @@
 import type { Transaction, TransactionDraft, UserRole } from '../types/finance'
-import { RoleSwitcher } from './RoleSwitcher'
 import { TransactionForm } from './TransactionForm'
 
 interface RoleBasedAccessSectionProps {
   role: UserRole
   categories: string[]
   editingTransaction: Transaction | null
-  onChangeRole: (role: UserRole) => void
   onSubmitTransaction: (draft: TransactionDraft) => void
   onCancelEdit: () => void
 }
@@ -15,7 +13,6 @@ export const RoleBasedAccessSection = ({
   role,
   categories,
   editingTransaction,
-  onChangeRole,
   onSubmitTransaction,
   onCancelEdit,
 }: RoleBasedAccessSectionProps) => {
@@ -30,7 +27,6 @@ export const RoleBasedAccessSection = ({
 
       <div className="role-access-grid">
         <article className="role-capability-card">
-          <RoleSwitcher role={role} onChangeRole={onChangeRole} />
 
           <p className={`role-status ${canManageTransactions ? 'role-admin' : 'role-viewer'}`}>
             Current mode: {canManageTransactions ? 'Admin' : 'Viewer'}

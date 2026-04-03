@@ -1,13 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react'
 import { ActionStatusBanner } from './components/ActionStatusBanner'
-import { DashboardOverview } from './components/DashboardOverview'
 import { DateRangeSelectorMock } from './components/DateRangeSelectorMock'
 import { InsightsSection } from './components/InsightsSection'
 import { NoDataBanner } from './components/NoDataBanner'
 import { RoleBasedAccessSection } from './components/RoleBasedAccessSection'
 import { StateManagementSection } from './components/StateManagementSection'
 import { ThemeToggle } from './components/ThemeToggle'
-import { TransactionsSection } from './components/TransactionsSection'
+
+// Lazy-loaded heavy components (contains charts and huge tables)
+const DashboardOverview = lazy(() => import('./components/DashboardOverview').then((mod) => ({ default: mod.DashboardOverview })))
+const TransactionsSection = lazy(() => import('./components/TransactionsSection').then((mod) => ({ default: mod.TransactionsSection })))
 import {
   dateRangePresetLabels,
   filterByDateRangePreset,
@@ -277,11 +279,13 @@ function App() {
         )}
 
         {/* 1. Top Level Metrics (Full Width) */}
-        <DashboardOverview
-          summary={rangeSummary}
-          monthlyTrend={rangeMonthlyTrend}
-          categoryBreakdown={rangeCategoryBreakdown}
-        />
+        <Suspense fallback={<div className="panel" style={{ minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading metrics...</div>}>
+          <DashboardOverview
+            summary={rangeSummary}
+            monthlyTrend={rangeMonthlyTrend}
+            categoryBreakdown={rangeCategoryBreakdown}
+          />
+        </Suspense>
 
         {/* 2. Middle Contextual Split (Insights + Controls) */}
         <div className="context-split">
@@ -310,22 +314,24 @@ function App() {
         </div>
 
         {/* 3. Deep Data Table (Full Width for max readability) */}
-        <TransactionsSection
-          role={role}
-          filters={filters}
-          categories={categories}
-          months={months}
-          transactions={rangeFilteredTransactions}
-          onUpdateFilters={setFilters}
-          onResetFilters={resetFilters}
-          onEditTransaction={(transactionId) => {
-            if (!canManageTransactions) {
-              return
-            }
+        <Suspense fallback={<div className="panel" style={{ minHeight: '600px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading transaction data...</div>}>
+          <TransactionsSection
+            role={role}
+            filters={filters}
+            categories={categories}
+            months={months}
+            transactions={rangeFilteredTransactions}
+            onUpdateFilters={setFilters}
+            onResetFilters={resetFilters}
+            onEditTransaction={(transactionId) => {
+              if (!canManageTransactions) {
+                return
+              }
 
-            setEditingTransactionId(transactionId)
-          }}
-        />
+              setEditingTransactionId(transactionId)
+            }}
+          />
+        </Suspense>
 
         {/* 4. Footer Debug Area */}
         <div className="footer-debug">

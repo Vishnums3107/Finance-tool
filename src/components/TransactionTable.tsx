@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { formatDate, formatSignedCurrency } from '../lib/format'
 import { getNetAmount } from '../lib/analytics'
 import type { Transaction, UserRole } from '../types/finance'
@@ -6,13 +7,18 @@ interface TransactionTableProps {
   role: UserRole
   transactions: Transaction[]
   onEditTransaction: (transactionId: string) => void
+  onDeleteTransaction: (transactionId: string) => void
 }
 
 export const TransactionTable = ({
   role,
   transactions,
   onEditTransaction,
+  onDeleteTransaction,
 }: TransactionTableProps) => {
+  // Track which row is in "confirm delete" state
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+
   if (transactions.length === 0) {
     return (
       <div className="empty-table">
@@ -21,6 +27,19 @@ export const TransactionTable = ({
       </div>
     )
   }
+
+  const handleDeleteClick = (id: string) => {
+    if (pendingDeleteId === id) {
+      // Second click = confirmed
+      onDeleteTransaction(id)
+      setPendingDeleteId(null)
+    } else {
+      // First click = ask for confirmation
+      setPendingDeleteId(id)
+    }
+  }
+
+  const handleCancelDelete = () => setPendingDeleteId(null)
 
   return (
     <div className="table-scroll">
@@ -38,9 +57,13 @@ export const TransactionTable = ({
         <tbody>
           {transactions.map((transaction) => {
             const netAmount = getNetAmount(transaction)
+            const isPendingDelete = pendingDeleteId === transaction.id
 
             return (
-              <tr key={transaction.id}>
+              <tr
+                key={transaction.id}
+                className={isPendingDelete ? 'row-pending-delete' : ''}
+              >
                 <td>{formatDate(transaction.date)}</td>
                 <td>{transaction.description}</td>
                 <td>{transaction.category}</td>
@@ -53,14 +76,51 @@ export const TransactionTable = ({
                   {formatSignedCurrency(netAmount)}
                 </td>
                 {role === 'admin' && (
-                  <td>
-                    <button
-                      type="button"
-                      className="inline-button"
-                      onClick={() => onEditTransaction(transaction.id)}
-                    >
-                      Edit
-                    </button>
+                  <td className="action-cell">
+                    {isPendingDelete ? (
+                      // Confirmation state
+                      <span className="delete-confirm-group">
+                        <button
+                          type="button"
+                          className="inline-button delete-confirm-btn"
+                          onClick={() => handleDeleteClick(transaction.id)}
+                          title="Confirm delete"
+                          aria-label={`Confirm deletion of ${transaction.description}`}
+                        >
+                          ✓ Confirm
+                        </button>
+                        <button
+                          type="button"
+                          className="inline-button"
+                          onClick={handleCancelDelete}
+                          title="Cancel"
+                          aria-label="Cancel delete"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ) : (
+                      // Normal state
+                      <span className="action-btn-group">
+                        <button
+                          type="button"
+                          className="inline-button"
+                          onClick={() => onEditTransaction(transaction.id)}
+                          aria-label={`Edit ${transaction.description}`}
+                        >
+                          ✎ Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="inline-button delete-btn"
+                          onClick={() => handleDeleteClick(transaction.id)}
+                          aria-label={`Delete ${transaction.description}`}
+                          title="Delete this transaction"
+                        >
+                          🗑
+                        </button>
+                      </span>
+                    )}
                   </td>
                 )}
               </tr>

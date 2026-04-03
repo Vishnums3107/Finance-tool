@@ -823,6 +823,54 @@ tbody tr:hover .pill {
   text-align: right;
 }
 
+/* Delete action buttons */
+.action-cell {
+  white-space: nowrap;
+}
+
+.action-btn-group,
+.delete-confirm-group {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.delete-btn {
+  color: var(--negative) !important;
+  border-color: rgba(244, 63, 94, 0.3) !important;
+  opacity: 0.7;
+  transition: all 0.2s var(--motion-spring) !important;
+}
+
+.delete-btn:hover:not(:disabled) {
+  opacity: 1;
+  background: rgba(244, 63, 94, 0.1) !important;
+  border-color: var(--negative) !important;
+  transform: scale(1.1) !important;
+}
+
+.delete-confirm-btn {
+  color: var(--negative) !important;
+  border-color: var(--negative) !important;
+  background: rgba(244, 63, 94, 0.12) !important;
+  font-weight: 700 !important;
+  animation: confirm-pulse 1s ease-in-out infinite;
+}
+
+@keyframes confirm-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
+  50% { box-shadow: 0 0 0 4px rgba(244, 63, 94, 0); }
+}
+
+/* Row awaiting delete confirmation */
+.row-pending-delete {
+  background: rgba(244, 63, 94, 0.06) !important;
+  border-left: 3px solid var(--negative);
+  animation: none !important; /* suppress row stagger during confirmation */
+  transition: background 0.3s ease;
+}
+
+
 /* Side Stack */
 .side-stack {
   display: grid;

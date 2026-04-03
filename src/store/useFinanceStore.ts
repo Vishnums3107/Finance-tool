@@ -45,6 +45,7 @@ interface FinanceStore {
   clearEditingTransaction: () => void
   addTransaction: (draft: TransactionDraft) => void
   updateTransaction: (id: string, draft: TransactionDraft) => void
+  deleteTransaction: (id: string) => void
   restoreDemoData: () => void
   loadTransactionsFromMockApi: () => Promise<boolean>
 }
@@ -122,6 +123,22 @@ export const useFinanceStore = create<FinanceStore>()(
                 category: draft.category.trim(),
               }
             }),
+          }
+        })
+      },
+      deleteTransaction: (id) => {
+        set((state) => {
+          if (state.role !== 'admin') {
+            return state
+          }
+
+          return {
+            transactions: state.transactions.filter(
+              (transaction) => transaction.id !== id,
+            ),
+            // Clear editing state if the deleted tx was being edited
+            editingTransactionId:
+              state.editingTransactionId === id ? null : state.editingTransactionId,
           }
         })
       },

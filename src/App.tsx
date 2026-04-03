@@ -59,6 +59,7 @@ function App() {
     clearEditingTransaction,
     addTransaction,
     updateTransaction,
+    deleteTransaction,
     restoreDemoData,
     loadTransactionsFromMockApi,
   } = useFinanceDashboardState()
@@ -344,6 +345,14 @@ function App() {
               }
 
               setEditingTransactionId(transactionId)
+            }}
+            onDeleteTransaction={(transactionId) => {
+              if (!canManageTransactions) {
+                return
+              }
+
+              deleteTransaction(transactionId)
+              showActionStatus('Transaction deleted.', 'success')
             }}
           />
         </Suspense>

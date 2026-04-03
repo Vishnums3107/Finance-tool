@@ -31,6 +31,7 @@ export const useFinanceDashboardState = () => {
   )
   const addTransaction = useFinanceStore((state) => state.addTransaction)
   const updateTransaction = useFinanceStore((state) => state.updateTransaction)
+  const deleteTransaction = useFinanceStore((state) => state.deleteTransaction)
   const restoreDemoData = useFinanceStore((state) => state.restoreDemoData)
   const loadTransactionsFromMockApi = useFinanceStore(
     (state) => state.loadTransactionsFromMockApi,
@@ -119,6 +120,7 @@ export const useFinanceDashboardState = () => {
     clearEditingTransaction,
     addTransaction,
     updateTransaction,
+    deleteTransaction,
     restoreDemoData,
     loadTransactionsFromMockApi,
   }

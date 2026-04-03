@@ -18,6 +18,7 @@ interface TransactionsSectionProps {
   onUpdateFilters: (nextFilters: Partial<TransactionFilters>) => void
   onResetFilters: () => void
   onEditTransaction: (transactionId: string) => void
+  onDeleteTransaction: (transactionId: string) => void
 }
 
 export const TransactionsSection = ({
@@ -29,6 +30,7 @@ export const TransactionsSection = ({
   onUpdateFilters,
   onResetFilters,
   onEditTransaction,
+  onDeleteTransaction,
 }: TransactionsSectionProps) => {
   const hasActiveFilters =
     filters.search.trim().length > 0 ||
@@ -91,6 +93,7 @@ export const TransactionsSection = ({
         role={role}
         transactions={transactions}
         onEditTransaction={onEditTransaction}
+        onDeleteTransaction={onDeleteTransaction}
       />
     </section>
   )

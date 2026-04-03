@@ -1,5 +1,6 @@
 import { formatCompactCurrency, formatCount } from '../lib/format'
 import type { FinanceSummary } from '../types/finance'
+import { AnimatedNumber } from './AnimatedNumber'
 
 interface SummaryCardsProps {
   summary: FinanceSummary
@@ -9,27 +10,39 @@ export const SummaryCards = ({ summary }: SummaryCardsProps) => {
   const cards = [
     {
       label: 'Total Balance',
-      value: formatCompactCurrency(summary.balance),
+      rawValue: summary.balance,
+      formattedValue: formatCompactCurrency(summary.balance),
       tone: summary.balance >= 0 ? 'positive' : 'negative',
       hint: 'Net cash position',
+      prefix: '$',
+      isCurrency: true,
     },
     {
       label: 'Total Income',
-      value: formatCompactCurrency(summary.income),
+      rawValue: summary.income,
+      formattedValue: formatCompactCurrency(summary.income),
       tone: 'positive',
       hint: 'Recorded inflows',
+      prefix: '$',
+      isCurrency: true,
     },
     {
       label: 'Total Expenses',
-      value: formatCompactCurrency(summary.expenses),
+      rawValue: summary.expenses,
+      formattedValue: formatCompactCurrency(summary.expenses),
       tone: 'negative',
       hint: 'Recorded outflows',
+      prefix: '$',
+      isCurrency: true,
     },
     {
       label: 'Savings Rate',
-      value: `${summary.savingsRate.toFixed(1)}%`,
+      rawValue: summary.savingsRate,
+      formattedValue: `${summary.savingsRate.toFixed(1)}%`,
       tone: summary.savingsRate >= 0 ? 'positive' : 'negative',
       hint: `${formatCount(summary.transactionCount)} processed entries`,
+      prefix: '',
+      isCurrency: false,
     },
   ] as const
 
@@ -42,10 +55,24 @@ export const SummaryCards = ({ summary }: SummaryCardsProps) => {
           style={{ animationDelay: `${index * 0.07}s` }}
         >
           <p className="summary-label">{card.label}</p>
-          <p className="summary-value">{card.value}</p>
+          <p className="summary-value">
+            {card.prefix}
+            <AnimatedNumber
+              value={card.rawValue}
+              formatter={(n) =>
+                card.isCurrency
+                  ? new Intl.NumberFormat('en-US', {
+                      notation: 'compact',
+                      maximumFractionDigits: 1,
+                    }).format(n)
+                  : `${n.toFixed(1)}%`
+              }
+            />
+          </p>
           <p className="summary-hint">{card.hint}</p>
         </article>
       ))}
     </div>
   )
 }
+

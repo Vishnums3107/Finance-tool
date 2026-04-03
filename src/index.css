@@ -994,6 +994,192 @@ tbody tr:hover .pill {
   100% { transform: translate(150px, -100px); }
 }
 
+/* ─── Creative Micro-Interactions ───────────────────────── */
+
+/* Table row stagger entrance */
+tbody tr {
+  animation: row-slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+tbody tr:nth-child(1)  { animation-delay: 0.02s; }
+tbody tr:nth-child(2)  { animation-delay: 0.04s; }
+tbody tr:nth-child(3)  { animation-delay: 0.06s; }
+tbody tr:nth-child(4)  { animation-delay: 0.08s; }
+tbody tr:nth-child(5)  { animation-delay: 0.10s; }
+tbody tr:nth-child(6)  { animation-delay: 0.12s; }
+tbody tr:nth-child(7)  { animation-delay: 0.14s; }
+tbody tr:nth-child(8)  { animation-delay: 0.16s; }
+tbody tr:nth-child(9)  { animation-delay: 0.18s; }
+tbody tr:nth-child(10) { animation-delay: 0.20s; }
+
+@keyframes row-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Row hover glow */
+tbody tr {
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+tbody tr:hover {
+  background: var(--bg-accent-glow);
+  transform: scale(1.005);
+}
+
+/* Button ripple effect */
+.primary-button, .ghost-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.primary-button::before, .ghost-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgba(255, 255, 255, 0.35) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.primary-button:active::before, .ghost-button:active::before {
+  opacity: 1;
+  transition: opacity 0s;
+}
+
+/* Input focus glow */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--glass-glow), var(--shadow-soft);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* Permission list animated markers */
+.permission-list li {
+  transition: all 0.3s var(--motion-spring);
+}
+
+.permission-list li.allowed::marker {
+  content: '✓ ';
+}
+
+.permission-list li.blocked::marker {
+  content: '✗ ';
+}
+
+.permission-list li:hover {
+  transform: translateX(4px);
+}
+
+/* Role status badge pulse */
+.role-admin {
+  animation: admin-pulse 2s ease-in-out infinite;
+}
+
+@keyframes admin-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Insight cards number pop */
+.insight-item p {
+  transition: transform 0.2s var(--motion-spring);
+}
+
+.insight-item:hover p {
+  transform: scale(1.02);
+}
+
+/* Summary card shimmer on load */
+.summary-card {
+  animation: card-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.summary-card:nth-child(1) { animation-delay: 0.1s; }
+.summary-card:nth-child(2) { animation-delay: 0.18s; }
+.summary-card:nth-child(3) { animation-delay: 0.26s; }
+.summary-card:nth-child(4) { animation-delay: 0.34s; }
+
+@keyframes card-pop {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Pill badge bounce */
+.pill {
+  transition: transform 0.2s var(--motion-spring);
+}
+
+.pill:hover {
+  transform: scale(1.1);
+}
+
+/* Meta chips subtle slide-in */
+.meta-chip {
+  animation: chip-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.meta-chip:nth-child(1) { animation-delay: 0.3s; }
+.meta-chip:nth-child(2) { animation-delay: 0.38s; }
+.meta-chip:nth-child(3) { animation-delay: 0.46s; }
+.meta-chip:nth-child(4) { animation-delay: 0.54s; }
+.meta-chip:nth-child(5) { animation-delay: 0.62s; }
+
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Smooth filter panel transitions */
+.filters-grid {
+  transition: all 0.3s var(--motion-spring);
+}
+
+.filters-grid:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--glass-glow);
+}
+
+/* Export button success flash */
+.sync-button:not(:disabled) {
+  transition: all 0.3s ease;
+}
+
+/* Theme toggle smooth color transition */
+.app-shell {
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Reduced motion: respect user preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* ─── Financial Health Gauge ────────────────────────────── */
 .health-gauge-panel {
   display: flex;

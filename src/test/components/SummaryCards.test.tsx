@@ -16,15 +16,15 @@ describe('SummaryCards', () => {
 
     // Check Balance
     expect(screen.getByText('Total Balance')).toBeInTheDocument()
-    expect(screen.getByText(/\$?2[\.,]?0*K/i)).toBeInTheDocument()
+    expect(screen.getByText(/\$?2[.,]?0*K/i)).toBeInTheDocument()
 
     // Check Income
     expect(screen.getByText('Total Income')).toBeInTheDocument()
-    expect(screen.getByText(/\$?5[\.,]?0*K/i)).toBeInTheDocument()
+    expect(screen.getByText(/\$?5[.,]?0*K/i)).toBeInTheDocument()
 
     // Check Expenses
     expect(screen.getByText('Total Expenses')).toBeInTheDocument()
-    expect(screen.getByText(/\$?3[\.,]?0*K/i)).toBeInTheDocument()
+    expect(screen.getByText(/\$?3[.,]?0*K/i)).toBeInTheDocument()
 
     // Check Savings Rate
     expect(screen.getByText('Savings Rate')).toBeInTheDocument()

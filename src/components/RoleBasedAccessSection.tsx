@@ -27,7 +27,6 @@ export const RoleBasedAccessSection = ({
 
       <div className="role-access-grid">
         <article className="role-capability-card">
-
           <p className={`role-status ${canManageTransactions ? 'role-admin' : 'role-viewer'}`}>
             Current mode: {canManageTransactions ? 'Admin' : 'Viewer'}
           </p>

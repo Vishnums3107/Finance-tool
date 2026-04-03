@@ -209,12 +209,14 @@ function App() {
         </div>
 
         <div className="topbar-actions screen-only">
-          <RoleSwitcher role={role} onChangeRole={setRole} />
-          <ThemeToggle themeMode={themeMode} onToggle={toggleThemeMode} />
-          <DateRangeSelectorMock
-            value={reportingRange}
-            onChange={setReportingRange}
-          />
+          <div className="topbar-controls-row" style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+            <RoleSwitcher role={role} onChangeRole={setRole} />
+            <ThemeToggle themeMode={themeMode} onToggle={toggleThemeMode} />
+            <DateRangeSelectorMock
+              value={reportingRange}
+              onChange={setReportingRange}
+            />
+          </div>
 
           <div className="export-actions">
             <button

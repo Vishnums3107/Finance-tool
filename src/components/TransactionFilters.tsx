@@ -60,12 +60,15 @@ export const TransactionFiltersBar = ({
   onReset,
 }: TransactionFiltersProps) => {
   const [localSearch, setLocalSearch] = useState(filters.search)
-  const debouncedSearch = useDebounce(localSearch, 300)
 
-  // Sync external search clears (like Reset)
-  useEffect(() => {
-    setLocalSearch(filters.search)
-  }, [filters.search])
+  // Sync external search clears (like Reset) by reacting to prop changes during render 
+  // or storing previous prop. A common pattern is keying the component, but we can also
+  // manage it safely. Actually, resetting filters.search directly in the input is simplest.
+  if (filters.search !== localSearch && filters.search === '') {
+    setLocalSearch('')
+  }
+
+  const debouncedSearch = useDebounce(localSearch, 300)
 
   // Fire update to parent when debounced value changes (only if different)
   useEffect(() => {

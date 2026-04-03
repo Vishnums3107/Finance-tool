@@ -3,10 +3,11 @@ import { ActionStatusBanner } from './components/ActionStatusBanner'
 import { DateRangeSelectorMock } from './components/DateRangeSelectorMock'
 import { InsightsSection } from './components/InsightsSection'
 import { NoDataBanner } from './components/NoDataBanner'
-import { RoleBasedAccessSection } from './components/RoleBasedAccessSection'
+import { RoleStatusPanel } from './components/RoleStatusPanel'
 import { RoleSwitcher } from './components/RoleSwitcher'
 import { StateManagementSection } from './components/StateManagementSection'
 import { ThemeToggle } from './components/ThemeToggle'
+import { TransactionFormPanel } from './components/TransactionFormPanel'
 
 // Lazy-loaded heavy components (contains charts and huge tables)
 const DashboardOverview = lazy(() => import('./components/DashboardOverview').then((mod) => ({ default: mod.DashboardOverview })))
@@ -291,11 +292,13 @@ function App() {
           />
         </Suspense>
 
-        {/* 2. Middle Contextual Split (Insights + Controls) */}
+        {/* 2. Middle Contextual Split (Insights + Role + Form) */}
         <div className="context-split">
           <InsightsSection insights={rangeInsights} />
-          
-          <RoleBasedAccessSection
+
+          <RoleStatusPanel role={role} />
+
+          <TransactionFormPanel
             role={role}
             categories={categories}
             editingTransaction={editingTransaction}

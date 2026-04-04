@@ -61,6 +61,12 @@ export interface CategoryBreakdownPoint {
   share: number
 }
 
+export interface InsightCategoryDetail {
+  name: string
+  amount: number
+  share: number
+}
+
 export interface FinanceSummary {
   income: number
   expenses: number
@@ -70,13 +76,28 @@ export interface FinanceSummary {
 }
 
 export interface FinanceInsights {
+  transactionCount: number
+  income: number
+  expenses: number
+  balance: number
+  savingsRate: number
   highestCategoryName: string
   highestCategoryAmount: number
+  highestCategoryShare: number
+  topExpenseCategories: InsightCategoryDetail[]
   currentMonthLabel: string
+  currentMonthIncome: number
   currentMonthExpense: number
+  currentMonthNet: number
   previousMonthLabel: string
+  previousMonthIncome: number
   previousMonthExpense: number
+  previousMonthNet: number
   comparisonPercent: number | null
   comparisonDirection: 'up' | 'down' | 'flat' | 'na'
+  largestExpenseDescription: string
+  largestExpenseCategory: string
+  largestExpenseAmount: number
+  largestExpenseDate: string
   observation: string
 }

@@ -7,9 +7,12 @@ interface DateRangeSelectorMockProps {
 
 const options: Array<{ value: DateRangePreset; label: string }> = [
   { value: 'last30', label: dateRangePresetLabels.last30 },
+  { value: 'last90', label: dateRangePresetLabels.last90 },
+  { value: 'last6m', label: dateRangePresetLabels.last6m },
   { value: 'month', label: dateRangePresetLabels.month },
   { value: 'qtd', label: dateRangePresetLabels.qtd },
   { value: 'ytd', label: dateRangePresetLabels.ytd },
+  { value: 'all', label: dateRangePresetLabels.all },
 ]
 
 export const DateRangeSelectorMock = ({

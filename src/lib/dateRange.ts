@@ -1,10 +1,20 @@
-export type DateRangePreset = 'last30' | 'month' | 'qtd' | 'ytd'
+export type DateRangePreset =
+  | 'last30'
+  | 'last90'
+  | 'last6m'
+  | 'month'
+  | 'qtd'
+  | 'ytd'
+  | 'all'
 
 export const dateRangePresetLabels: Record<DateRangePreset, string> = {
   last30: 'Last 30 Days',
+  last90: 'Last 90 Days',
+  last6m: 'Last 6 Months',
   month: 'Current Month',
   qtd: 'Quarter to Date',
   ytd: 'Year to Date',
+  all: 'All Time',
 }
 
 interface DateRangeBounds {
@@ -21,6 +31,21 @@ const toUtcDate = (isoDate: string) => {
   return new Date(Date.UTC(year, month - 1, day))
 }
 
+const shiftUtcDays = (date: Date, days: number) => {
+  const shifted = new Date(date)
+  shifted.setUTCDate(shifted.getUTCDate() + days)
+  return shifted
+}
+
+const getUtcMonthStart = (referenceDate: Date, monthsBackInclusive: number) =>
+  new Date(
+    Date.UTC(
+      referenceDate.getUTCFullYear(),
+      referenceDate.getUTCMonth() - (monthsBackInclusive - 1),
+      1,
+    ),
+  )
+
 const getPresetBounds = (
   preset: DateRangePreset,
   referenceDate: Date,
@@ -28,8 +53,17 @@ const getPresetBounds = (
   const end = new Date(referenceDate)
 
   if (preset === 'last30') {
-    const start = new Date(referenceDate)
-    start.setUTCDate(start.getUTCDate() - 29)
+    const start = shiftUtcDays(referenceDate, -29)
+    return { start, end }
+  }
+
+  if (preset === 'last90') {
+    const start = shiftUtcDays(referenceDate, -89)
+    return { start, end }
+  }
+
+  if (preset === 'last6m') {
+    const start = getUtcMonthStart(referenceDate, 6)
     return { start, end }
   }
 
@@ -48,6 +82,13 @@ const getPresetBounds = (
     )
 
     return { start, end }
+  }
+
+  if (preset === 'all') {
+    return {
+      start: new Date(Date.UTC(1970, 0, 1)),
+      end,
+    }
   }
 
   return {

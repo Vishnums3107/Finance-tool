@@ -10,7 +10,6 @@ import { StateManagementSection } from './components/StateManagementSection'
 import { ThemeToggle } from './components/ThemeToggle'
 import { TransactionFormPanel } from './components/TransactionFormPanel'
 
-// Lazy-loaded heavy components (contains charts and huge tables)
 const DashboardOverview = lazy(() => import('./components/DashboardOverview').then((mod) => ({ default: mod.DashboardOverview })))
 const TransactionsSection = lazy(() => import('./components/TransactionsSection').then((mod) => ({ default: mod.TransactionsSection })))
 import {
@@ -32,7 +31,7 @@ import { useFinanceDashboardState } from './store/useFinanceDashboardState'
 import { useUiPreferencesStore } from './store/useUiPreferencesStore'
 
 function App() {
-  const [reportingRange, setReportingRange] = useState<DateRangePreset>('qtd')
+  const [reportingRange, setReportingRange] = useState<DateRangePreset>('last6m')
   const [actionStatus, setActionStatus] = useState<{
     message: string
     tone: 'info' | 'success' | 'error'
@@ -218,7 +217,7 @@ function App() {
         </div>
 
         <div className="topbar-actions screen-only">
-          <div className="topbar-controls-row" style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+          <div className="topbar-controls-row">
             <RoleSwitcher role={role} onChangeRole={setRole} />
             <ThemeToggle themeMode={themeMode} onToggle={toggleThemeMode} />
             <DateRangeSelectorMock
@@ -291,7 +290,6 @@ function App() {
           />
         )}
 
-        {/* 1. Top Level Metrics (Full Width) */}
         <Suspense fallback={<div className="panel" style={{ minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading metrics...</div>}>
           <DashboardOverview
             summary={rangeSummary}
@@ -300,36 +298,38 @@ function App() {
           />
         </Suspense>
 
-        {/* 2. Middle Contextual Split (Insights + Role + Form) */}
         <div className="context-split">
-          <InsightsSection insights={rangeInsights} />
+          <div className="context-column context-column-primary">
+            <InsightsSection insights={rangeInsights} />
+          </div>
 
-          <RoleStatusPanel role={role} />
+          <div className="context-column context-column-secondary">
+            <RoleStatusPanel role={role} />
 
-          <TransactionFormPanel
-            role={role}
-            categories={categories}
-            editingTransaction={editingTransaction}
-            onSubmitTransaction={(draft) => {
-              if (!canManageTransactions) {
-                return
-              }
+            <TransactionFormPanel
+              role={role}
+              categories={categories}
+              editingTransaction={editingTransaction}
+              onSubmitTransaction={(draft) => {
+                if (!canManageTransactions) {
+                  return
+                }
 
-              if (editingTransaction) {
-                updateTransaction(editingTransaction.id, draft)
-              } else {
-                addTransaction(draft)
-              }
+                if (editingTransaction) {
+                  updateTransaction(editingTransaction.id, draft)
+                } else {
+                  addTransaction(draft)
+                }
 
-              clearEditingTransaction()
-            }}
-            onCancelEdit={clearEditingTransaction}
-          />
-
-          <FinancialHealthGauge healthScore={rangeHealthScore} />
+                clearEditingTransaction()
+              }}
+              onCancelEdit={clearEditingTransaction}
+            />
+          </div>
         </div>
 
-        {/* 3. Deep Data Table (Full Width for max readability) */}
+        <FinancialHealthGauge healthScore={rangeHealthScore} />
+
         <Suspense fallback={<div className="panel" style={{ minHeight: '600px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading transaction data...</div>}>
           <TransactionsSection
             role={role}
@@ -357,7 +357,6 @@ function App() {
           />
         </Suspense>
 
-        {/* 4. Footer Debug Area */}
         <div className="footer-debug">
           <StateManagementSection
             role={role}

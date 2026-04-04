@@ -10,7 +10,7 @@ export const InsightsSection = ({ insights }: InsightsSectionProps) => {
     <section className="panel reveal delay-5 insights-section">
       <div className="panel-heading">
         <h2>Insights Section</h2>
-        <p>Highest spending category, monthly comparison, and practical observation.</p>
+        <p>Financial snapshot, month-over-month movement, category concentration, and largest expense details.</p>
       </div>
       <InsightsPanel insights={insights} />
     </section>

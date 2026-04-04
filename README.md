@@ -98,7 +98,14 @@ npm run preview
 
 ## Deployment
 
-Deploy to Vercel or Netlify with:
+### GitHub Pages
+
+1. Push to `main`.
+2. The workflow in `.github/workflows/deploy-pages.yml` builds and deploys automatically.
+3. In GitHub repository settings, ensure Pages source is set to `GitHub Actions`.
+4. Live URL: `https://vishnums3107.github.io/Finance-tool/`
+
+### Vercel or Netlify
 
 1. Build command: `npm run build`
 2. Publish/output directory: `dist`

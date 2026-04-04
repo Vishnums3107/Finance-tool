@@ -3,7 +3,9 @@ import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  // Project pages are served from /<repo-name>/, while local dev stays at /.
+  base: command === 'build' ? '/Finance-tool/' : '/',
   plugins: [react()],
   test: {
     globals: true,
@@ -30,4 +32,4 @@ export default defineConfig({
       },
     },
   },
-})
+}))

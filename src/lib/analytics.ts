@@ -1,4 +1,4 @@
-import { formatMonthLabel, getMonthKey } from './format'
+import { formatCurrency, formatDate, formatMonthLabel, getMonthKey } from './format'
 import type {
   CategoryBreakdownPoint,
   FinanceInsights,
@@ -99,12 +99,22 @@ export const getCategoryBreakdown = (
 }
 
 export const getInsights = (transactions: Transaction[]): FinanceInsights => {
+  const summary = getFinanceSummary(transactions)
   const trend = getMonthlyTrend(transactions)
   const breakdown = getCategoryBreakdown(transactions)
 
   const highestCategory = breakdown[0]
   const latestMonth = trend[trend.length - 1]
   const previousMonth = trend[trend.length - 2]
+  const biggestExpense = transactions
+    .filter((transaction) => transaction.type === 'expense')
+    .sort((a, b) => b.amount - a.amount)[0]
+
+  const topExpenseCategories = breakdown.slice(0, 3).map((category) => ({
+    name: category.name,
+    amount: category.value,
+    share: category.share,
+  }))
 
   const comparisonPercent =
     latestMonth && previousMonth && previousMonth.expenses > 0
@@ -120,33 +130,46 @@ export const getInsights = (transactions: Transaction[]): FinanceInsights => {
           ? 'down'
           : 'flat'
 
-  const biggestExpense = transactions
-    .filter((transaction) => transaction.type === 'expense')
-    .sort((a, b) => b.amount - a.amount)[0]
-
   let observation = 'No transactions yet. Add your first transaction to generate insights.'
 
   if (latestMonth) {
+      const topCategoryText = highestCategory
+        ? `Top spending category is ${highestCategory.name}, accounting for ${highestCategory.share.toFixed(1)}% of total expenses.`
+        : 'No spending categories were recorded.'
+
     if (latestMonth.net < 0) {
-      observation = `Spending exceeded earnings in ${latestMonth.monthLabel}; review recurring costs.`
+        observation = `${latestMonth.monthLabel} closed negative by ${formatCurrency(Math.abs(latestMonth.net))}. ${topCategoryText}`
     } else if (biggestExpense) {
-      observation = `Largest single expense is ${biggestExpense.category} at $${Math.round(
-        biggestExpense.amount,
-      )}.`
+        observation = `${latestMonth.monthLabel} stayed positive by ${formatCurrency(latestMonth.net)}. ${topCategoryText} The largest single expense was ${biggestExpense.description} in ${biggestExpense.category} at ${formatCurrency(biggestExpense.amount)} on ${formatDate(biggestExpense.date)}.`
     } else {
-      observation = `Cash flow is positive in ${latestMonth.monthLabel}.`
+        observation = `${latestMonth.monthLabel} stayed positive by ${formatCurrency(latestMonth.net)}. ${topCategoryText}`
     }
   }
 
   return {
+      transactionCount: summary.transactionCount,
+      income: summary.income,
+      expenses: summary.expenses,
+      balance: summary.balance,
+      savingsRate: summary.savingsRate,
     highestCategoryName: highestCategory?.name ?? 'N/A',
     highestCategoryAmount: highestCategory?.value ?? 0,
+      highestCategoryShare: highestCategory?.share ?? 0,
+      topExpenseCategories,
     currentMonthLabel: latestMonth?.monthLabel ?? 'N/A',
+      currentMonthIncome: latestMonth?.income ?? 0,
     currentMonthExpense: latestMonth?.expenses ?? 0,
+      currentMonthNet: latestMonth?.net ?? 0,
     previousMonthLabel: previousMonth?.monthLabel ?? 'N/A',
+      previousMonthIncome: previousMonth?.income ?? 0,
     previousMonthExpense: previousMonth?.expenses ?? 0,
+      previousMonthNet: previousMonth?.net ?? 0,
     comparisonPercent,
     comparisonDirection,
+      largestExpenseDescription: biggestExpense?.description ?? 'N/A',
+      largestExpenseCategory: biggestExpense?.category ?? 'N/A',
+      largestExpenseAmount: biggestExpense?.amount ?? 0,
+      largestExpenseDate: biggestExpense ? formatDate(biggestExpense.date) : 'N/A',
     observation,
   }
 }

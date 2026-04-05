@@ -10,6 +10,8 @@ export const RoleSwitcher = ({ role, onChangeRole }: RoleSwitcherProps) => {
     <label className="role-switcher">
       <span className="control-label">Role</span>
       <select
+        id="role-selector"
+        name="role"
         value={role}
         onChange={(event) => onChangeRole(event.target.value as UserRole)}
         aria-label="Select user role"

@@ -113,6 +113,8 @@ export const TransactionForm = ({
       <label>
         <span className="control-label">Date</span>
         <input
+          id="transaction-date"
+          name="date"
           type="date"
           value={draft.date}
           onChange={(event) =>
@@ -128,6 +130,8 @@ export const TransactionForm = ({
       <label>
         <span className="control-label">Description</span>
         <input
+          id="transaction-description"
+          name="description"
           type="text"
           value={draft.description}
           placeholder="Example: Grocery run"
@@ -144,6 +148,8 @@ export const TransactionForm = ({
       <label>
         <span className="control-label">Amount (USD)</span>
         <input
+          id="transaction-amount"
+          name="amount"
           type="number"
           value={draft.amount}
           min={1}
@@ -161,6 +167,8 @@ export const TransactionForm = ({
       <label>
         <span className="control-label">Category</span>
         <select
+          id="transaction-category"
+          name="category"
           value={customCategoryEnabled ? '__custom__' : draft.category}
           onChange={(event) => {
             const selectedValue = event.target.value
@@ -202,6 +210,8 @@ export const TransactionForm = ({
 
         {customCategoryEnabled && (
           <input
+            id="transaction-category-custom"
+            name="customCategory"
             type="text"
             value={draft.category}
             placeholder="Enter custom category"
@@ -219,6 +229,8 @@ export const TransactionForm = ({
       <label>
         <span className="control-label">Type</span>
         <select
+          id="transaction-type"
+          name="type"
           value={draft.type}
           onChange={(event) =>
             updateDraft((current) => ({

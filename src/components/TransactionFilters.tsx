@@ -87,6 +87,8 @@ export const TransactionFiltersBar = ({
       <label>
         <span className="control-label">Search</span>
         <input
+          id="filter-search"
+          name="search"
           type="text"
           placeholder="Search description or category"
           value={localSearch}
@@ -97,6 +99,8 @@ export const TransactionFiltersBar = ({
       <label>
         <span className="control-label">Type</span>
         <select
+          id="filter-type"
+          name="type"
           value={filters.type}
           onChange={(event) =>
             onUpdateFilters({
@@ -113,6 +117,8 @@ export const TransactionFiltersBar = ({
       <label>
         <span className="control-label">Category</span>
         <select
+          id="filter-category"
+          name="category"
           value={filters.category}
           onChange={(event) =>
             onUpdateFilters({
@@ -132,6 +138,8 @@ export const TransactionFiltersBar = ({
       <label>
         <span className="control-label">Month</span>
         <select
+          id="filter-month"
+          name="month"
           value={filters.month}
           onChange={(event) =>
             onUpdateFilters({
@@ -151,6 +159,8 @@ export const TransactionFiltersBar = ({
       <label>
         <span className="control-label">Sort By</span>
         <select
+          id="filter-sort-by"
+          name="sortBy"
           value={filters.sortBy}
           onChange={(event) =>
             onUpdateFilters({
@@ -169,6 +179,8 @@ export const TransactionFiltersBar = ({
       <label>
         <span className="control-label">Direction</span>
         <select
+          id="filter-sort-direction"
+          name="sortDirection"
           value={filters.sortDir}
           onChange={(event) =>
             onUpdateFilters({
@@ -187,6 +199,8 @@ export const TransactionFiltersBar = ({
       <label>
         <span className="control-label">Min Amount</span>
         <input
+          id="filter-min-amount"
+          name="minAmount"
           type="number"
           min={0}
           step={1}
@@ -203,6 +217,8 @@ export const TransactionFiltersBar = ({
       <label>
         <span className="control-label">Max Amount</span>
         <input
+          id="filter-max-amount"
+          name="maxAmount"
           type="number"
           min={0}
           step={1}
@@ -219,6 +235,8 @@ export const TransactionFiltersBar = ({
       <label>
         <span className="control-label">Grouping</span>
         <select
+          id="filter-group-by"
+          name="groupBy"
           value={filters.groupBy}
           onChange={(event) =>
             onUpdateFilters({

@@ -23,6 +23,8 @@ export const DateRangeSelectorMock = ({
     <label className="date-range-switcher" title="Filter dashboard data by date range">
       <span className="control-label">Date Range</span>
       <select
+        id="date-range-selector"
+        name="dateRange"
         value={value}
         onChange={(event) => onChange(event.target.value as DateRangePreset)}
         aria-label="Select date range (UI mock)"
